@@ -47,19 +47,19 @@ module.exports = {
                 }, function(err,newUser){
                     if(err){console.log("Error in creating new user");return}
                     console.log('New user created');
-                    return res.redirect('back');
+                    return res.redirect('/user/login');
                 })
             }
             else{
                 console.log('Email alreay exists');
-                return res.redirect('/user/login');
+                return res.redirect('back');
             }
         })
 
     },
 
     createSession : function(req, res) {
-        return res.redirect('/');
+        return res.redirect('/user/profile');
     },
 
     destroySession: function(req, res) {
