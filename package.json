@@ -21,8 +21,11 @@
   },
   "homepage": "https://github.com/WahidX/SampleAuthApp#readme",
   "dependencies": {
+    "bcrypt": "^5.0.0",
+    "bcryptjs": "^2.4.3",
     "connect-mongo": "^3.2.0",
     "cookie-parser": "^1.4.5",
+    "crypto": "^1.0.1",
     "ejs": "^3.1.3",
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.0",
@@ -30,6 +33,8 @@
     "mongoose": "^5.9.25",
     "node-sass-middleware": "^0.11.0",
     "passport": "^0.4.1",
+    "passport-google-oauth": "^2.0.0",
+    "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0"
   }
 }
