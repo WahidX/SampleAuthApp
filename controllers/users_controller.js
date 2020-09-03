@@ -35,7 +35,7 @@ module.exports = {
     createUser : function(req, res) {
         
         if(req.body.password != req.body.confirm_password){
-            console.log("password doesn't match");
+            req.flash('error', 'Password doesn\'t match');
             return res.redirect('back');
         }
 
@@ -55,23 +55,26 @@ module.exports = {
                         }, function(err, newUser){
                             if(err){console.log("Error in creating new user", err);return;}
                             console.log('New user created');
+                            req.flash('success', 'New user created');
                             return res.redirect('/user/login');
                         });
                     })}
                 );
             }else{
-                console.log('Email alreay exists');
+                req.flash('error', 'Email already exists');
                 return res.redirect('back');
             }
         })
     },
 
     createSession : function(req, res) {
+        req.flash('success', 'Loggd in successfully!');
         return res.redirect('/user/profile');
     },
 
     destroySession: function(req, res) {
         req.logout();
+        req.flash('success', 'Loggd out successfully!');
         return res.redirect('/');
     }
 };

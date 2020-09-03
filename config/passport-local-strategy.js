@@ -1,35 +1,27 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const bcrypt = require('bcryptjs');
-
 const User = require('../models/users');
 
+// Setting up LocalStrategy
 passport.use(new LocalStrategy({
-        usernameField: 'email'
+        usernameField: 'email',
+        passReqToCallback: true         // To use req in below function
     },
-    function(email, password, done){
-        User.findOne({email:email}, function(err, user){
-            if(err){
-                console.log("Err while getting user--> user");
-                return done(err);
-            }
+    async function(req, email, password, done){
+        let user = await User.findOne({email:email});
             
-            if(user){
-                bcrypt.compare(password, user.password, function(err, isMatch){
-                    if(err){console.log('err while matching pass with hash',err);return;}
-                    
-                    console.log('isMatch  ',isMatch);
+        if(user){
+            // User found for that email so checking password
+            let isMatch = await bcrypt.compare(password, user.password);
+            if(isMatch){
+                return done(null, user);
+            }
+        }
 
-                    if(isMatch){
-                        return done(null, user);
-                    }
-                });
-            }
-            else{
-                console.log('password incorrect');
-                return done(null, false);
-            }
-        });
+        // User not found or password did not match
+        req.flash('error', 'Email or password is incorrect');
+        return done(null, false);
     }
 ))
 
