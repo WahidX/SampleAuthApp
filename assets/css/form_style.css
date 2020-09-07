@@ -1,0 +1,18 @@
+.background {
+  background: url("/image/sunny_road_hd_widescreen_wallpapers_1440x900.jpeg");
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: cover; }
+  .background .form-container {
+    margin: auto;
+    position: absolute;
+    top: 17vh;
+    left: 10vh;
+    padding: 30px;
+    background-color: cornflowerblue;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px 0px #000000; }
+    .background .form-container p a {
+      text-decoration: none;
+      color: blue; }

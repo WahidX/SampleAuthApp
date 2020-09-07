@@ -2,6 +2,7 @@ const User = require('../models/users');
 const bcrypt = require('bcryptjs');
 const bc = require('bcryptjs');
 const saltRounds = 10;
+const loginMailer = require('../mailers/comment_mailer');
 
 
 module.exports = {
@@ -69,6 +70,8 @@ module.exports = {
 
     createSession : function(req, res) {
         req.flash('success', 'Loggd in successfully!');
+        loginMailer.newComment(req.user.name);
+
         return res.redirect('/user/profile');
     },
 

@@ -1,9 +1,9 @@
 footer {
-  position: absolute;
-  bottom: 0px;
+  position: sticky;
+  bottom: 0vh;
   width: 100%;
   display: flex;
-  background-color: #5fb4fd; }
+  background-color: cornflowerblue; }
   footer p {
     margin: auto;
     display: inline-block; }
