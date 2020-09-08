@@ -64,6 +64,7 @@ app.use(passport.session());
 app.use(passport.setAuthenticatedUser);
 app.use(flash());
 app.use(customMidWare.setFlash);
+app.use(customMidWare.setApp);
 
 // Router
 app.use('/', require('./routes'));

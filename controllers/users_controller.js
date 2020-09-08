@@ -1,8 +1,7 @@
 const User = require('../models/users');
-const bcrypt = require('bcryptjs');
-const bc = require('bcryptjs');
-const saltRounds = 10;
-const loginMailer = require('../mailers/comment_mailer');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const resetCodeMailer = require('../mailers/reset_code_mailer');
 
 
 module.exports = {
@@ -33,51 +32,113 @@ module.exports = {
         });
     },
 
-    createUser : function(req, res) {
+    createUser : async function(req, res) {
         
         if(req.body.password != req.body.confirm_password){
             req.flash('error', 'Password doesn\'t match');
             return res.redirect('back');
         }
 
-        User.findOne({email:req.body.email}, function(err, user){
-            if(err){console.log('Error in getting email');return;}
-
-            if(!user){
-                bcrypt.genSalt(saltRounds, function (err, salt) {
-                    if (err) {console.log('err in generating salt',err);return;}
-                    bcrypt.hash(req.body.password, salt, function(err, hash) {
-                        if (err) {console.log('err in generating hash',err);return;}
-                        
-                        User.create({
-                            email: req.body.email,
-                            password: hash,
-                            name: req.body.name
-                        }, function(err, newUser){
-                            if(err){console.log("Error in creating new user", err);return;}
-                            console.log('New user created');
-                            req.flash('success', 'New user created');
-                            return res.redirect('/user/login');
-                        });
-                    })}
-                );
-            }else{
-                req.flash('error', 'Email already exists');
+        try{
+            let user = await User.findOne({email:req.body.email});
+            if(user){
+                req.flash('error','Email already exists');
                 return res.redirect('back');
             }
-        })
+
+            // Hashing the given password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            
+            let newUser = await User.create({
+                email: req.body.email,
+                password: hashedPassword,
+                name: req.body.name
+                    
+            });
+
+            req.flash('success', 'New user created');
+            return res.redirect('/user/login');
+            
+        } 
+        catch(err){
+            console.log("Err: ",err);
+            return res.redirect('back');
+        }
     },
 
     createSession : function(req, res) {
         req.flash('success', 'Loggd in successfully!');
-        loginMailer.newComment(req.user.name);
-
+        
         return res.redirect('/user/profile');
     },
 
     destroySession: function(req, res) {
         req.logout();
-        req.flash('success', 'Loggd out successfully!');
+        req.flash('success', 'Logged out successfully!');
         return res.redirect('/');
+    }, 
+
+    resetPassword: function(req, res) {
+        // Sends mail n then renders the reset page
+        req.app.reset_code = crypto.randomBytes(3).toString('hex');
+        req.app.u_id = req.user.id;
+        
+        resetCodeMailer.resetCode(
+            "<h1>Hi req.user.name,</h1><br><h5>Here's your password reset code</h5><h3> `" + req.app.reset_code +"`</h3>",
+            req.user.email
+        );
+        console.log('reset code sent : ',req.app.reset_code);
+        req.flash('success', 'Reset code sent');
+        return res.render('reset_code_verify',{
+            'title' : 'Reset Password'
+        });
+
+    },
+
+    resetCodeCheck: function(req, res){
+        // TODO Account lockdown and resend mail
+
+        if(req.body.reset_code == req.app.reset_code){
+            req.app.reset_code = null;
+            return res.redirect('/user/new-password');
+        }else{
+            req.flash('error', 'Invalid code');
+            return res.redirect("back");
+        }
+    },
+
+    newPassword: function(req, res){
+        // Renders the page for taking new password
+        return res.render('new_password',{
+            'title' : 'New Password'
+        });
+    },
+
+    updatePassword: async function(req, res){
+        try{
+            if (req.body.new_password == req.body.confirm_password ){
+                req.flash('error', 'Passwords didn\'t match');
+                return res.redirect('back');
+            }
+
+            let user = await User.findById(req.app.u_id);
+            
+            // Hashing the given password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.new_password, salt);
+
+            user.password = hashedPassword;
+            user.save();
+
+            req.logout();
+            req.flash('success', 'Password Changed!');
+
+            return res.redirect('/user/login');
+        }
+        catch(err){
+            console.log("Err: ",err);
+            return res.redirect('back');
+        }
     }
 };
