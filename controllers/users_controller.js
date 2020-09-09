@@ -79,21 +79,26 @@ module.exports = {
         return res.redirect('/');
     }, 
 
-    resetPassword: function(req, res) {
+    resetPassword: async function(req, res) {
         // Sends mail n then renders the reset page
         req.app.reset_code = crypto.randomBytes(3).toString('hex');
-        req.app.u_id = req.user.id;
         
-        resetCodeMailer.resetCode(
-            "<h1>Hi req.user.name,</h1><br><h5>Here's your password reset code</h5><h3> `" + req.app.reset_code +"`</h3>",
-            req.user.email
-        );
-        console.log('reset code sent : ',req.app.reset_code);
-        req.flash('success', 'Reset code sent');
-        return res.render('reset_code_verify',{
-            'title' : 'Reset Password'
-        });
-
+        try{
+            if (!req.app.u_email){
+                req.app.u_id = req.user.id;
+                req.app.u_email = req.user.email;
+            }
+        
+            resetCodeMailer.resetCode(
+                "<h1>Hi req.user.name,</h1><br><h5>Here's your password reset code</h5><h3> `" + req.app.reset_code +"`</h3>",
+                req.app.u_email
+            );
+            console.log('reset code sent : ',req.app.reset_code);
+            req.flash('success', 'Reset code sent');
+            return res.render('reset_code_verify',{
+                'title' : 'Reset Password'
+            });
+        }catch(err){ console.log("err: ",err); req.flash('error','Access Denied!'); return res.redirect('back');}
     },
 
     resetCodeCheck: function(req, res){
@@ -117,7 +122,8 @@ module.exports = {
 
     updatePassword: async function(req, res){
         try{
-            if (req.body.new_password == req.body.confirm_password ){
+            console.log()
+            if (req.body.new_password != req.body.confirm_password ){
                 req.flash('error', 'Passwords didn\'t match');
                 return res.redirect('back');
             }
@@ -131,6 +137,7 @@ module.exports = {
             user.password = hashedPassword;
             user.save();
 
+            req.app = null;
             req.logout();
             req.flash('success', 'Password Changed!');
 
@@ -140,5 +147,24 @@ module.exports = {
             console.log("Err: ",err);
             return res.redirect('back');
         }
+    },
+
+    getEmail : function(req,res){
+        return res.render('get_email',{
+            'title': 'Confirm email'
+        });
+    },
+
+    forgetPassword : async function(req, res) {
+        let user = await User.findOne({'email': req.body.get_email});
+        if(!user){
+            req.flash('error','Email not registered');
+            return res.redirect('back');
+        }
+
+        req.app.u_email = req.body.get_email;
+        req.app.u_id = user._id;
+        return res.redirect('/user/reset-password');
     }
+
 };
