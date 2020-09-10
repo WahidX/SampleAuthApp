@@ -79,7 +79,21 @@ module.exports = {
         return res.redirect('/');
     }, 
 
+    passwordCheck: function(req, res){
+        return res.render('password-check',{
+            'title': 'Confirm Password'
+        });
+    },
+
     resetPassword: async function(req, res) {
+
+        // Checking password
+        let isMatch = await bcrypt.compare(req.body.confirm_password, req.user.password);
+        if(!isMatch){
+            req.flash('error', 'Incorrect Password');
+            return res.redirect('back');
+        }
+
         // Sends mail n then renders the reset page
         req.app.reset_code = crypto.randomBytes(3).toString('hex');
         

@@ -9,11 +9,13 @@ router.get('/login', userController.login);
 router.get('/signup', userController.signup);
 router.post('/create-user', userController.createUser);
 router.post('/create-session', passport.authenticate(
-    'local',
-    {failureRedirect: '/user/login'}
-), userController.createSession);
+                'local',
+                {failureRedirect: '/user/login'}
+            ), userController.createSession);
 router.get('/sign-out', userController.destroySession);
-router.get('/reset-password', userController.resetPassword);
+
+router.get('/password-check', passport.checkAuthentication, userController.passwordCheck);
+router.post('/reset-password', userController.resetPassword);
 router.post('/check-reset-code', userController.resetCodeCheck);
 router.get('/new-password', userController.newPassword);
 router.post('/update_password', userController.updatePassword);

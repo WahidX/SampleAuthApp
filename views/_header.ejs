@@ -1,13 +1,13 @@
 <header>
     <link rel="stylesheet" href="/css/header.css">
 
-    <h1>Sample Auth App</h1>
+    <a href="/"><h1>Sample Auth App</h1></a>
     
 
     <% if(locals.user){ %>
         <p> <%= user.name %> </p>
         <p class="h-btn"> <a href="/user/sign-out">Sign Out</a> </p>
-        <p class="h-btn"> <a href="/user/reset-password">Reset Password</a></p>
+        <p class="h-btn"> <a href="/user/password-check">Reset Password</a></p>
     <% } else { %>
         <p class="h-btn"> <a href="/user/login">Sign in</a> </p>
         <p class="h-btn"> <a href="/user/signup">Sign up</a> </p>

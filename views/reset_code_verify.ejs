@@ -1,10 +1,16 @@
-<div class="container">
+<link rel="stylesheet" href="/css/form_style.css">
 
-    <form action="/user/check-reset-code" method="post"> 
-        <label for="reset_code">Enter reset code to the registered email</label>
-        <br>
-        <input type="text" id="reset_code" name="reset_code" required>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+<div class="background">
+    <div class="form-container">
 
+        <h3>Check your inbox of your registered email</h3>
+
+        <form action="/user/check-reset-code" method="post"> 
+            <label for="reset_code">Enter reset code</label>
+            <input type="text" class="form-control" placeholder="Reset Code" id="reset_code" name="reset_code" required>
+            <br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    
+    </div>
 </div>

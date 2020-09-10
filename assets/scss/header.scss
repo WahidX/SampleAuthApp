@@ -2,10 +2,15 @@ header{
     width: 100%;
     height: auto;
     background-color: cornflowerblue;
+    box-shadow: 0px 0px 15px 0px #00417e;
 
-    h1{
-        margin-left: 30px;
-        display: inline-block;
+    a{
+        h1{
+            text-decoration: none;
+            color: black;
+            margin-left: 30px;
+            display: inline-block;
+        }
     }
 
     p{
