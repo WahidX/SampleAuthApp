@@ -1,7 +1,6 @@
 const User = require('../models/users');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const resetCodeMailer = require('../mailers/reset_code_mailer');
 
 
 module.exports = {
@@ -80,69 +79,47 @@ module.exports = {
     }, 
 
     passwordCheck: function(req, res){
+        // Redirecting to update password if its a google verified account
+        if (req.user.password.slice(0,6) === 'google'){
+            return res.render('new_password',{
+                'title' : 'New Password'
+            });
+        }
+
         return res.render('password-check',{
             'title': 'Confirm Password'
         });
     },
 
     resetPassword: async function(req, res) {
+        try{
+            let isMatch = await bcrypt.compare(req.body.confirm_password, req.user.password);
+            if(!isMatch){
+                req.flash('error', 'Incorrect Password');
+                return res.redirect('back');
+            }
 
-        // Checking password
-        let isMatch = await bcrypt.compare(req.body.confirm_password, req.user.password);
-        if(!isMatch){
-            req.flash('error', 'Incorrect Password');
+            return res.render('new_password',{
+                'title' : 'New Password'
+            });
+        }
+        catch(err){
+            console.log("err: ",err); 
+            req.flash('error','Invalid password'); 
             return res.redirect('back');
         }
-
-        // Sends mail n then renders the reset page
-        req.app.reset_code = crypto.randomBytes(3).toString('hex');
-        
-        try{
-            if (!req.app.u_email){
-                req.app.u_id = req.user.id;
-                req.app.u_email = req.user.email;
-            }
-        
-            resetCodeMailer.resetCode(
-                "<h1>Hi req.user.name,</h1><br><h5>Here's your password reset code</h5><h3> `" + req.app.reset_code +"`</h3>",
-                req.app.u_email
-            );
-            console.log('reset code sent : ',req.app.reset_code);
-            req.flash('success', 'Reset code sent');
-            return res.render('reset_code_verify',{
-                'title' : 'Reset Password'
-            });
-        }catch(err){ console.log("err: ",err); req.flash('error','Access Denied!'); return res.redirect('back');}
-    },
-
-    resetCodeCheck: function(req, res){
-        // TODO Account lockdown and resend mail
-
-        if(req.body.reset_code == req.app.reset_code){
-            req.app.reset_code = null;
-            return res.redirect('/user/new-password');
-        }else{
-            req.flash('error', 'Invalid code');
-            return res.redirect("back");
-        }
-    },
-
-    newPassword: function(req, res){
-        // Renders the page for taking new password
-        return res.render('new_password',{
-            'title' : 'New Password'
-        });
     },
 
     updatePassword: async function(req, res){
         try{
-            console.log()
-            if (req.body.new_password != req.body.confirm_password ){
+            if (req.body.new_password !== req.body.confirm_password ){
                 req.flash('error', 'Passwords didn\'t match');
-                return res.redirect('back');
+                return res.render('new_password',{
+                    'title' : 'New Password'
+                });
             }
-
-            let user = await User.findById(req.app.u_id);
+            console.log(req.user);
+            let user = await User.findById(req.user.id);
             
             // Hashing the given password
             const salt = await bcrypt.genSalt(10);
@@ -151,7 +128,6 @@ module.exports = {
             user.password = hashedPassword;
             user.save();
 
-            req.app = null;
             req.logout();
             req.flash('success', 'Password Changed!');
 
@@ -161,24 +137,6 @@ module.exports = {
             console.log("Err: ",err);
             return res.redirect('back');
         }
-    },
-
-    getEmail : function(req,res){
-        return res.render('get_email',{
-            'title': 'Confirm email'
-        });
-    },
-
-    forgetPassword : async function(req, res) {
-        let user = await User.findOne({'email': req.body.get_email});
-        if(!user){
-            req.flash('error','Email not registered');
-            return res.redirect('back');
-        }
-
-        req.app.u_email = req.body.get_email;
-        req.app.u_id = user._id;
-        return res.redirect('/user/reset-password');
     }
 
 };

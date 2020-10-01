@@ -1,5 +1,7 @@
 * {
   position: relative; }
   * body {
-    background-color: thistle;
-    position: relative; }
+    background-color: #82f0ff;
+    position: relative;
+    height: 100%;
+    width: 100%; }

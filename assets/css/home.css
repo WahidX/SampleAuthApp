@@ -2,5 +2,8 @@
   position: relative;
   top: 3vh;
   left: 6vh;
-  color: red;
   font-size: 3rem; }
+
+.home-container #dummy {
+  width: auto;
+  height: 90%; }
