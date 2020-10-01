@@ -1,4 +1,5 @@
 .profile-container {
-  position: absolute;
+  position: relative;
   top: 10vh;
-  left: 7vh; }
+  left: 7vh;
+  height: 90%; }
