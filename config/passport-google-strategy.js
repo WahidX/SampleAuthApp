@@ -6,8 +6,8 @@ require('dotenv');
 
 // Setting up google strategy with app's tokens
 passport.use(new googleStrategy({
-        clientID: '296149790746-mikklk6u32f6erj4pu6en5kemn031a8c.apps.googleusercontent.com',
-        clientSecret: 'N3EVK6w95trGUapNe8B1rmb5',
+        clientID: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
         callbackURL: 'http://localhost:8000/user/auth/google/callback',
         passReqToCallback: true
     },

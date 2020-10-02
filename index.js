@@ -13,6 +13,7 @@ const flash = require('connect-flash');
 const customMidWare = require('./config/middleware');
 
 
+// sass middleware setup
 app.use(sassMiddleware({
     src: './assets/scss',
     dest: './assets/css',
@@ -58,7 +59,7 @@ app.use(session({
     )
 }));
 
-
+// Middlewares
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(passport.setAuthenticatedUser);
