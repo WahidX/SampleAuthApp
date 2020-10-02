@@ -7,6 +7,7 @@ This is an authentication system which can be used as a starter code for creatin
 ## Table of Contents
 
 - Installation
+- Folder Structure
 - Authentication Features
 - Techs used
 - Some Important Node library used
@@ -26,6 +27,18 @@ This is an authentication system which can be used as a starter code for creatin
    $ npm install
    ```
    Now just run the server using `npm start`
+
+---
+
+## Folder Structure
+
+   The files for this project are organized following the MVC structure. The main folders are:
+   - models
+   - views
+   - controller
+   - routes
+   - config
+   - assets
 
 ---
 
