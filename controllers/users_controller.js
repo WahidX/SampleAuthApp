@@ -1,7 +1,5 @@
 const User = require('../models/users');
 const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-
 
 module.exports = {
     profile : function(req, res) {
